@@ -13,7 +13,6 @@ public class EmployeeTaskManagementDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Employee> Employee { get; set; }
     public DbSet<EmployeeTasks> Tasks { get; set; }
     public DbSet<User> User { get; set; }
-    public DbSet<UserRoles> UserRoles { get; set; }
     public DbSet<Roles> Roles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -57,9 +56,6 @@ public class EmployeeTaskManagementDbContext : IdentityDbContext<IdentityUser>
             entity.Property(t => t.AssignedFrom)
                 .IsRequired();
 
-            entity.Property(t => t.AssignedTo)
-                .IsRequired();
-
             entity.Property(t => t.CreatedDate)
                 .IsRequired();
 
@@ -75,11 +71,6 @@ public class EmployeeTaskManagementDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<IdentityRole>(entity =>
         {
             entity.ToTable("Roles");
-        });
-
-        modelBuilder.Entity<IdentityUserRole<Guid>>(entity =>
-        {
-            entity.ToTable("UserRoles").HasNoKey();
         });
     }
 }

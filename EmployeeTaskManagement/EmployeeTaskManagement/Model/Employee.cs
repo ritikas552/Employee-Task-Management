@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeTaskManagement.Model;
 
-public class Employee
+public class Employee : baseEntity
 {
     [Key]
     public Guid EmployeeId { get; set; }

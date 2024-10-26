@@ -4,6 +4,7 @@ using EmployeeTaskManagement.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EmployeeTaskManagement.Migrations
 {
     [DbContext(typeof(EmployeeTaskManagementDbContext))]
-    partial class EmployeeTaskManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241023083008_UpdatedEmployeeAndTaskEmployeeTable")]
+    partial class UpdatedEmployeeAndTaskEmployeeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,6 +283,26 @@ namespace EmployeeTaskManagement.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("nvarchar(34)");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.ToTable("UserRoles", (string)null);
+
+                    b.HasDiscriminator().HasValue("IdentityUserRole<Guid>");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
@@ -326,6 +349,13 @@ namespace EmployeeTaskManagement.Migrations
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.HasDiscriminator().HasValue("User");
+                });
+
+            modelBuilder.Entity("EmployeeTaskManagement.Model.UserRoles", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>");
+
+                    b.HasDiscriminator().HasValue("UserRoles");
                 });
 
             modelBuilder.Entity("EmployeeTaskManagement.Model.EmployeeTasks", b =>

@@ -2,7 +2,7 @@
 
 namespace EmployeeTaskManagement.Model;
 
-public class EmployeeTasks
+public class EmployeeTasks : baseEntity
 {
     [Key]
     public int TaskId { get; set; }
@@ -17,14 +17,12 @@ public class EmployeeTasks
 
     public string AssignedFrom { get; set; }
 
-    public string AssignedTo { get; set; }
-
-    public DateTime CreatedDate { get; set; }
-
     public DateTime? DueDate { get; set; }
 
     public Guid EmployeeId { get; set; }
 
     public Employee Employee { get; set; }
+
+    public string? AssignedTo => Employee?.Email;
 }
 

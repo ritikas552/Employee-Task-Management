@@ -23,6 +23,10 @@ namespace EmployeeTaskManagement.Controllers
         {
             try
             {
+                if(request.Password == string.Empty)
+                {
+                    request.Password = "Test@12345";
+                };
                 var response = await _adminServices.AddEmployee(request);
                 return Ok(response);
             }
@@ -34,11 +38,11 @@ namespace EmployeeTaskManagement.Controllers
 
         [HttpPut("UpdateEmployee/{email}")]
         [Authorize(Roles = "Admin")]
-        public IActionResult UpdateEmployee(string email, EmployeeRequest request)
+        public async Task<IActionResult> UpdateEmployee(string email, EmployeeRequest request)
         {
             try
             {
-                var response = _adminServices.UpdateEmployee(email, request);
+                var response = await _adminServices.UpdateEmployee(email, request);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -46,15 +50,30 @@ namespace EmployeeTaskManagement.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
 
-        [HttpGet("GetAllEmployees")]
+        [HttpDelete("DeleteEmployee/{email}")]
         [Authorize(Roles = "Admin")]
-        public IActionResult GetAllEmployees()
+        public async Task<IActionResult> DeleteEmployee(string email)
         {
             try
             {
-                var response = _adminServices.GetAllEmployees();
+                var response = await _adminServices.DeleteEmployeeAsync(email);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpGet("GetAllEmployees")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllEmployees()
+        {
+            try
+            {
+                var response = await _adminServices.GetAllEmployees();
                 return Ok(response);
             }
             catch (Exception ex)

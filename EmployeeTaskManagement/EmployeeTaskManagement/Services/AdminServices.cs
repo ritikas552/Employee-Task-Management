@@ -11,6 +11,7 @@ public interface IAdminServices
 {
     Task<ResponseModel> AddEmployee(EmployeeRequest request);
     Task<ResponseModel> UpdateEmployee(string email, EmployeeRequest request);
+    Task<ResponseModel> DeleteEmployeeAsync(string email);
     Task<IEnumerable<EmployeeRequest>> GetAllEmployees();
     ResponseModel CreateTask(TaskRequestModel request);
 }
@@ -52,7 +53,8 @@ public class AdminServices : IAdminServices
             {
                 Email = request.Email,
                 FirstName = request.FirstName,
-                LastName = request.LastName
+                LastName = request.LastName,
+                IsActive = true,
             };
 
             await _context.Employee.AddAsync(employeeModel);
@@ -98,11 +100,32 @@ public class AdminServices : IAdminServices
         }
     }
 
+    public async Task<ResponseModel> DeleteEmployeeAsync(string email)
+    {
+        try
+        {
+            var existing = await _context.Employee.FirstOrDefaultAsync(e => e.Email == email);
+            if (existing == null)
+            {
+                return new ResponseModel { Message = $"{email} not exist", IsSuccess = false };
+            }
+            existing.IsActive = false;
+            _context.Employee.Update(existing);
+            await _context.SaveChangesAsync();
+
+            return new ResponseModel { Message = $"{existing.Email} updated successfully", IsSuccess = true };
+        }
+        catch (Exception ex)
+        {
+            return new ResponseModel { Message = $"Error updating employee: {ex.Message}", IsSuccess = false };
+        }
+    }
+
     public async Task<IEnumerable<EmployeeRequest>> GetAllEmployees()
     {
         try
         {
-            var allEmployees = await _context.Employee.ToListAsync();
+            var allEmployees = await _context.Employee.Where(e => e.IsActive).ToListAsync();
 
             var employeeRequests = allEmployees.Select(employee => new EmployeeRequest
             {

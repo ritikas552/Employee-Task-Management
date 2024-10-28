@@ -12,5 +12,5 @@ public class EmployeeRequest
     [EmailAddress]
     public string Email { get; set; }
 
-    public string? Password { get; set; } = "Test@12345";
+    public string? Password { get; set; }
 }

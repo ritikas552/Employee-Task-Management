@@ -12,7 +12,7 @@ public interface IAdminServices
     Task<ResponseModel> AddEmployee(EmployeeRequest request);
     Task<ResponseModel> UpdateEmployee(string email, EmployeeRequest request);
     Task<ResponseModel> DeleteEmployeeAsync(string email);
-    Task<IEnumerable<EmployeeRequest>> GetAllEmployees();
+    Task<IEnumerable<Employee>> GetAllEmployees();
     ResponseModel CreateTask(TaskRequestModel request);
 }
 
@@ -20,11 +20,13 @@ public class AdminServices : IAdminServices
 {
     private EmployeeTaskManagementDbContext _context;
     private readonly UserManager<User> _userManager;
+    private readonly LoggedUserService _loggedUserService;
 
-    public AdminServices(EmployeeTaskManagementDbContext context, UserManager<User> userManager)
+    public AdminServices(EmployeeTaskManagementDbContext context, UserManager<User> userManager, LoggedUserService loggedUserService)
     {
         _context = context;
         _userManager = userManager;
+        _loggedUserService = loggedUserService;
     }
 
     public async Task<ResponseModel> AddEmployee(EmployeeRequest request)
@@ -121,35 +123,38 @@ public class AdminServices : IAdminServices
         }
     }
 
-    public async Task<IEnumerable<EmployeeRequest>> GetAllEmployees()
+    public async Task<IEnumerable<Employee>> GetAllEmployees()
     {
         try
         {
-            var allEmployees = await _context.Employee.Where(e => e.IsActive).ToListAsync();
-
-            var employeeRequests = allEmployees.Select(employee => new EmployeeRequest
-            {
-                FirstName = employee.FirstName,
-                LastName = employee.LastName,
-                Email = employee.Email,
-            });
-
-            return employeeRequests;
+            return await _context.Employee.Where(e => e.IsActive).ToListAsync();
         }
         catch (Exception ex)
         {
-            return Enumerable.Empty<EmployeeRequest>();
+            return Enumerable.Empty<Employee>();
         }
     }
 
     public ResponseModel CreateTask(TaskRequestModel request)
     {
+        var employee = _context.Employee.FirstOrDefault(e => e.Email == request.Email);
+        if(employee == null)
+        {
+            return new ResponseModel()
+            {
+                Message = $"{employee} not found",
+                IsSuccess = false
+            };
+        }
         var task = new EmployeeTasks
         {
             Title = request.Title,
             Description = request.Description,
             CreatedDate = DateTime.Now,
             IsActive = true,
+            Status = request.Status,
+            AssignedFrom = _loggedUserService.GetCurrentUser(),
+            EmployeeId = employee.EmployeeId
         };
         try
         {

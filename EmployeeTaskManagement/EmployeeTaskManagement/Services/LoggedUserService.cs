@@ -16,7 +16,7 @@ public class LoggedUserService
         _contextAccessor = contextAccessor;
     }
 
-    public string GetCurrentUserAsync()
+    public string GetCurrentUser()
     {
         var claims = _contextAccessor?.HttpContext?.User.Claims;
 

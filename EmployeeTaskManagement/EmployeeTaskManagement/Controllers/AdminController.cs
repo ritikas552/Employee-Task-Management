@@ -82,7 +82,7 @@ namespace EmployeeTaskManagement.Controllers
             }
         }
 
-        [HttpPost("CreateTasks")]
+        [HttpPost("CreateTask")]
         [Authorize(Roles = "Admin")]
         public IActionResult CreateTask(TaskRequestModel request)
         {

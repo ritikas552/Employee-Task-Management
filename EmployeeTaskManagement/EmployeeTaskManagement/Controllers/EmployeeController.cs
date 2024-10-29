@@ -41,8 +41,8 @@ namespace EmployeeTaskManagement.Controllers
         {
             try
             {
-                var currentUserId = _loggedUserService.GetCurrentUserAsync();
-                var response = await _employeeServices.GetAllTasks(Guid.Parse(currentUserId));
+                var currentUserId = _loggedUserService.GetCurrentUser();
+                var response = await _employeeServices.GetAllTasks(currentUserId);
                 return Ok(response);
             }
             catch (Exception ex)

@@ -9,4 +9,6 @@ public class TaskRequestModel
     public string? Description { get; set; }
 
     public string Status { get; set; }
+
+    public string Email { get; set; }
 }

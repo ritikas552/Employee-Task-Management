@@ -7,7 +7,7 @@ namespace EmployeeTaskManagement.Services;
 public interface IEmployeeServices
 {
     Task<ResponseModel> UpdateTaskStatus(string status, int taskId);
-    Task<IEnumerable<EmployeeTasks>> GetAllTasks(Guid employeeId);
+    Task<IEnumerable<EmployeeTasks>> GetAllTasks(string employeeId);
 }
 
 public class EmployeeServices : IEmployeeServices
@@ -32,9 +32,29 @@ public class EmployeeServices : IEmployeeServices
         return new ResponseModel { IsSuccess = false, Message = "Task not found" };
     }
 
-    public async Task<IEnumerable<EmployeeTasks>> GetAllTasks(Guid employeeId)
+    public async Task<IEnumerable<EmployeeTasks>> GetAllTasks(string currentUserId)
     {
-        return await _context.Tasks.Where(t => t.EmployeeId == employeeId).ToListAsync();
+        var allTasks = await (from task in _context.Tasks
+                              join employee in _context.Employee
+                              on task.EmployeeId equals employee.EmployeeId
+                              where task.AssignedFrom == currentUserId
+                              select new EmployeeTasks
+                              {
+                                  TaskId = task.TaskId,
+                                  Title = task.Title,
+                                  Description = task.Description,
+                                  Status = task.Status,
+                                  AssignedFrom = task.AssignedFrom,
+                                  CreatedDate = task.CreatedDate,
+                                  IsActive = task.IsActive,
+                                  EmployeeId = task.EmployeeId,
+                                  Employee = new Employee
+                                  {
+                                      Email = employee.Email
+                                  }
+                              }).ToListAsync();
+
+        return allTasks;
     }
 
 }
